@@ -17,19 +17,19 @@ export function GridCell({children, className = '', type = 'empty', onMouseOver,
     } else if (type === 'start') {
         styleClasses = 'bg-blue-500'
     } else if (type === 'wall') {
-        styleClasses = 'bg-zinc-900'
+        styleClasses = 'bg-zinc-700'
     } else if (type === 'searched') {
-        styleClasses = 'bg-zinc-400 transition'
+        styleClasses = 'bg-zinc-300 transition'
     } else if (type === 'end') {
         styleClasses = 'bg-red-500'
     } else if (type === 'path') {
-        styleClasses = 'bg-green-500 transition'
+        styleClasses = 'bg-green-400 transition'
     }
 
     return <div
         onMouseDown={onMouseDown}
         onMouseOver={onMouseOver}
-        className={`w-20 h-20 border ${styleClasses} ${className}`}>
+        className={`border ${styleClasses} ${className}`}>
         {children}
     </div>
 }

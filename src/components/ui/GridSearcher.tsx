@@ -1,14 +1,18 @@
 import { Coordinate, Grid } from './Grid';
 import { Button } from './Button';
-import { useGridBFS } from '../hooks/useGridBFS';
+import { useGridBFSDFS } from '../hooks/useGridBFSDFS';
 import { coordinateInArray, coordinatesEqual } from '../../helpers';
 import { useState } from 'react';
 
 export function GridSearcher () {
     const [walls, setWalls] = useState<Coordinate[]>([])
     const [placingWalls, setPlacingWalls] = useState(true)
+    const [searchMode, setSearchMode] = useState<'BFS'|'DFS'>('BFS')
 
     const handleBrush = (position: Coordinate) => {
+        if (isSearching) {
+            return
+        }
         if (placingWalls) {
             if (!coordinateInArray(walls, position)) {
                 setWalls([...walls, position])
@@ -28,11 +32,11 @@ export function GridSearcher () {
         path,
         end,
         startSearch,
-    } = useGridBFS(10, 10, {x:0, y:0}, {x:9, y:9}, walls, 50)
+    } = useGridBFSDFS(searchMode, 25, 25, {x:0, y:0}, {x:9, y:9}, walls, 50)
 
     return (
         <div
-            className='flex flex-col items-start gap-2 p-4'
+            className='flex flex-col gap-2 p-4 h-screen'
             onKeyDown={(e) => {
                 if (e.key ===  'x') {
                     setPlacingWalls(!placingWalls)
@@ -47,8 +51,14 @@ export function GridSearcher () {
                 >
                     {`${placingWalls ? 'Placing Walls' : 'Erasing'}`}
                 </Button>
+                <Button
+                    onClick={() => setSearchMode(searchMode === 'BFS' ? 'DFS' : 'BFS')}
+                >
+                    {searchMode}
+                </Button>
             </div>
             <Grid
+                className='h-full'
                 onMouseActiveOverCell={handleBrush}
                 width={width}
                 height={height}

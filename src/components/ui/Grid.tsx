@@ -17,9 +17,10 @@ export interface GridProps {
     currSearching?: Coordinate
     path: Coordinate[]
     onMouseActiveOverCell: (position: Coordinate) => void
+    className?: string
 }
 
-export function Grid ({width, height, start, end, walls, searched, currSearching, path, onMouseActiveOverCell}: GridProps) {
+export function Grid ({width, height, start, end, walls, searched, currSearching, path, onMouseActiveOverCell, className = ''}: GridProps) {
     const [mouseDown, setMouseDown] = useState(false)
 
     const handleMouseOverCell = (coordinate: Coordinate) => {
@@ -62,7 +63,7 @@ export function Grid ({width, height, start, end, walls, searched, currSearching
             setMouseDown(true)
         }}
         onMouseUp={() => setMouseDown(false)}
-        className="inline-grid w-fit border"
+        className={`grid border ${className}`}
         style={{gridTemplateColumns: `repeat(${width}, 1fr)`}}>
         {cells}
     </div>)

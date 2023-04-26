@@ -3,7 +3,7 @@ import { coordinateInArray, coordinatesEqual } from '../../helpers'
 import { Coordinate } from '../ui/Grid'
 
 
-export function useGridBFS (width: number, height: number, start: Coordinate, end:Coordinate, walls: Coordinate[], delay: number) {
+export function useGridBFSDFS (mode: 'BFS' | 'DFS', width: number, height: number, start: Coordinate, end:Coordinate, walls: Coordinate[], delay: number) {
     const [currSearching, setCurrSearching] = useState<Coordinate|undefined>(undefined)
     const [searched, setSearched] = useState<Coordinate[]>([])
     const [isSearching, setIsSearching] = useState(false)
@@ -19,7 +19,7 @@ export function useGridBFS (width: number, height: number, start: Coordinate, en
 
         while (queue.length > 0) {
             await new Promise(resolve => setTimeout(resolve, delay));
-            const curr = queue.shift() as Coordinate
+            const curr = mode === 'BFS' ? queue.shift() as Coordinate : queue.pop() as Coordinate
             visited.push(curr)
             setSearched(visited)
             setCurrSearching(curr)
