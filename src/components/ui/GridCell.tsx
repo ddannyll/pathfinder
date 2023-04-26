@@ -1,6 +1,8 @@
 export type GridCellTypes = 'start' | 'end' | 'wall' | 'searched' | 'empty' | 'current' | 'path'
 
 interface GridCellProps {
+    x: number
+    y: number
     children?: React.ReactNode
     className?: string
     type?: GridCellTypes
@@ -8,7 +10,7 @@ interface GridCellProps {
     onMouseDown?: () => void
 }
 
-export function GridCell({children, className = '', type = 'empty', onMouseOver, onMouseDown}: GridCellProps) {
+export function GridCell({children, className = '', type = 'empty', onMouseOver, onMouseDown, x, y}: GridCellProps) {
     let styleClasses = ''
     if (type === 'empty') {
         styleClasses = 'bg-zinc-50'
@@ -27,9 +29,11 @@ export function GridCell({children, className = '', type = 'empty', onMouseOver,
     }
 
     return <div
+        data-x={x}
+        data-y={y}
         onMouseDown={onMouseDown}
         onMouseOver={onMouseOver}
-        className={`border ${styleClasses} ${className}`}>
+        className={`border aspect-square ${styleClasses} ${className}`}>
         {children}
     </div>
 }

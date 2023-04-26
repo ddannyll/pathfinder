@@ -12,32 +12,41 @@ export function useGridBFSDFS (mode: 'BFS' | 'DFS', width: number, height: numbe
     const startSearch = useCallback(async () => {
         setIsSearching(true)
         setPath([])
-        const queue = [start]
-        const toBeVisited: Coordinate[] = [start]
+
+        interface positionAndPrevious {
+            curr: Coordinate,
+            prev: null | Coordinate
+        }
+
+        const queue: positionAndPrevious[] = [{curr: start, prev: null}]
         const visited: Coordinate[] = []
         const pathMatrix: Coordinate[][] = Array.from(Array(height), () => new Array(width)) // 2D array
 
         while (queue.length > 0) {
+            const {curr, prev} = mode === 'BFS' ? queue.shift() as positionAndPrevious: queue.pop() as positionAndPrevious
+            if (coordinateInArray(visited, curr)) {
+                continue
+            }
             await new Promise(resolve => setTimeout(resolve, delay));
-            const curr = mode === 'BFS' ? queue.shift() as Coordinate : queue.pop() as Coordinate
             visited.push(curr)
             setSearched(visited)
             setCurrSearching(curr)
+            if (prev !== null) {
+                pathMatrix[curr.y][curr.x] = prev
+            }
             if (coordinatesEqual(curr, end)) {
                 break
             }
             let neighbors = [
                 { ...curr,   x: curr.x + 1 },
+                { ...curr,   y: curr.y - 1 },
                 { ...curr,   x: curr.x - 1 },
                 { ...curr,   y: curr.y + 1 },
-                { ...curr,   y: curr.y - 1 },
             ]
             neighbors = neighbors.filter(pos => pos.x >= 0 && pos.x < width && pos.y >= 0 && pos.y < height)
-            neighbors = neighbors.filter(pos => !coordinateInArray(walls, pos) && !coordinateInArray(toBeVisited, pos))
+            neighbors = neighbors.filter(pos => !coordinateInArray(walls, pos))
             for (const neighbor of neighbors) {
-                pathMatrix[neighbor.y][neighbor.x] = curr
-                queue.push(neighbor)
-                toBeVisited.push(neighbor)
+                queue.push({curr: neighbor, prev:curr})
             }
         }
 
@@ -45,6 +54,7 @@ export function useGridBFSDFS (mode: 'BFS' | 'DFS', width: number, height: numbe
         let curr = pathMatrix[end.y][end.x]
         const tempPath = [curr]
         while (curr && !coordinatesEqual(curr, start)) {
+            setCurrSearching(undefined)
             await new Promise(resolve => setTimeout(resolve, delay));
             setPath([...tempPath])
             curr = pathMatrix[curr.y][curr.x]

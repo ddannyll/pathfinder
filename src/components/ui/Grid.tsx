@@ -49,6 +49,8 @@ export function Grid ({width, height, start, end, walls, searched, currSearching
 
             }
             cells.push(<GridCell
+                x={j}
+                y={i}
                 onMouseDown={() => onMouseActiveOverCell(currCoordiante)}
                 onMouseOver={() => handleMouseOverCell(currCoordiante)}
                 type={type}
@@ -64,7 +66,7 @@ export function Grid ({width, height, start, end, walls, searched, currSearching
         }}
         onMouseUp={() => setMouseDown(false)}
         className={`grid border ${className}`}
-        style={{gridTemplateColumns: `repeat(${width}, 1fr)`}}>
+        style={{gridTemplateColumns: `repeat(${width}, 1fr)`, gridTemplateRows: `repeat(${height}, 1fr)`}}>
         {cells}
     </div>)
 }

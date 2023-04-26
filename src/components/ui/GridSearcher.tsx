@@ -32,7 +32,7 @@ export function GridSearcher () {
         path,
         end,
         startSearch,
-    } = useGridBFSDFS(searchMode, 25, 25, {x:0, y:0}, {x:9, y:9}, walls, 50)
+    } = useGridBFSDFS(searchMode, 60, 25, {x:0, y:0}, {x:9, y:9}, walls, 50)
 
     return (
         <div
@@ -58,7 +58,7 @@ export function GridSearcher () {
                 </Button>
             </div>
             <Grid
-                className='h-full'
+                className='max-h-full overflow-auto'
                 onMouseActiveOverCell={handleBrush}
                 width={width}
                 height={height}
