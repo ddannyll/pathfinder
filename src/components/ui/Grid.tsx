@@ -65,6 +65,7 @@ export function Grid ({width, height, start, end, walls, searched, currSearching
             setMouseDown(true)
         }}
         onMouseUp={() => setMouseDown(false)}
+        onMouseLeave={() => setMouseDown(false)}
         className={`grid border ${className}`}
         style={{gridTemplateColumns: `repeat(${width}, 1fr)`, gridTemplateRows: `repeat(${height}, 1fr)`}}>
         {cells}

@@ -1,13 +1,39 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { coordinateInArray, coordinatesEqual } from '../../helpers'
 import { Coordinate } from '../ui/Grid'
 
 
-export function useGridBFSDFS (mode: 'BFS' | 'DFS', width: number, height: number, start: Coordinate, end:Coordinate, walls: Coordinate[], delay: number) {
+export function useGridBFSDFS (
+    mode: 'BFS' | 'DFS',
+    initialWidth: number,
+    initialHeight: number,
+    initialStart: Coordinate,
+    initialEnd:Coordinate,
+    initialWalls: Coordinate[],
+    delay: number) {
+
     const [currSearching, setCurrSearching] = useState<Coordinate|undefined>(undefined)
     const [searched, setSearched] = useState<Coordinate[]>([])
     const [isSearching, setIsSearching] = useState(false)
     const [path, setPath] = useState<Coordinate[]>([])
+    const [width, setWidth] = useState(initialWidth)
+    const [height, setHeight] = useState(initialHeight)
+    const [start, setStart] = useState(initialStart)
+    const [end, setEnd] = useState(initialEnd)
+    const [walls, setWalls] = useState(initialWalls)
+
+    useEffect(() => {
+        if (start.x >= width || start.y >= height) {
+            setStart({x: 0, y: 0})
+        }
+        if (end.x >= width || end.y >= height) {
+            setEnd({x: width - 1, y: height - 1})
+        }
+    }, [width, height])
+
+    const clearSearched = () => {
+        setSearched([])
+    }
 
     const startSearch = useCallback(async () => {
         setIsSearching(true)
@@ -62,7 +88,24 @@ export function useGridBFSDFS (mode: 'BFS' | 'DFS', width: number, height: numbe
         }
 
         setIsSearching(false)
-    }, [start, end, width, height])
+    }, [start, end, width, height, walls])
 
-    return { width, height, walls, start, end, searched, path, currSearching, startSearch, isSearching }
+    return {
+        width,
+        height,
+        walls,
+        start,
+        end,
+        searched,
+        path,
+        currSearching,
+        isSearching,
+        startSearch,
+        clearSearched,
+        setWidth,
+        setHeight,
+        setWalls,
+        setEnd,
+        setStart,
+    }
 }

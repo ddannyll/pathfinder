@@ -5,7 +5,6 @@ import { coordinateInArray, coordinatesEqual } from '../../helpers';
 import { useState } from 'react';
 
 export function GridSearcher () {
-    const [walls, setWalls] = useState<Coordinate[]>([])
     const [placingWalls, setPlacingWalls] = useState(true)
     const [searchMode, setSearchMode] = useState<'BFS'|'DFS'>('BFS')
 
@@ -14,7 +13,7 @@ export function GridSearcher () {
             return
         }
         if (placingWalls) {
-            if (!coordinateInArray(walls, position)) {
+            if (!coordinateInArray(walls, position) && !coordinatesEqual(end, position)) {
                 setWalls([...walls, position])
             }
         } else {
@@ -26,13 +25,17 @@ export function GridSearcher () {
         searched,
         currSearching,
         isSearching,
-        width,
-        height,
         start,
         path,
         end,
+        width,
+        height,
         startSearch,
-    } = useGridBFSDFS(searchMode, 60, 25, {x:0, y:0}, {x:9, y:9}, walls, 10)
+        setHeight,
+        setWidth,
+        setWalls,
+        walls,
+    } = useGridBFSDFS(searchMode, 45, 20, {x:0, y:0}, {x:9, y:9}, [], 10)
 
     return (
         <div
@@ -56,6 +59,20 @@ export function GridSearcher () {
                 >
                     {searchMode}
                 </Button>
+                <label htmlFor="range" className='flex flex-col justify-center items-center'>
+                    {`Width: ${width}`}
+                    <input
+                        value={width}
+                        onChange={(e) => setWidth(parseInt(e.target.value))}
+                        type="range" id="range" min={5} max={50} step={1}/>
+                </label>
+                <label htmlFor="range" className='flex flex-col justify-center items-center'>
+                    {`Height: ${height}`}
+                    <input
+                        value={height}
+                        onChange={(e) => setHeight(parseInt(e.target.value))}
+                        type="range" id="range" min={5} max={50} step={1}/>
+                </label>
             </div>
             <Grid
                 className='max-h-full overflow-auto'
