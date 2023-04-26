@@ -32,7 +32,7 @@ export function GridSearcher () {
         path,
         end,
         startSearch,
-    } = useGridBFSDFS(searchMode, 60, 25, {x:0, y:0}, {x:9, y:9}, walls, 50)
+    } = useGridBFSDFS(searchMode, 60, 25, {x:0, y:0}, {x:9, y:9}, walls, 10)
 
     return (
         <div
