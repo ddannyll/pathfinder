@@ -71,7 +71,11 @@ export function Grid ({
                 x={j}
                 y={i}
                 onClick={onCellClick ? () => onCellClick(currCoordiante) : undefined}
-                onMouseDown={type === 'empty' || type === 'wall' ? () => onMouseActiveOverCell(currCoordiante) : undefined}
+                onMouseDown={
+                    type === 'empty' || type === 'wall' || type === 'searched' || type === 'path'
+                        ? () => onMouseActiveOverCell(currCoordiante)
+                        : undefined
+                }
                 onMouseOver={() => handleMouseOverCell(currCoordiante)}
                 className={hoverClasses}
                 type={type}

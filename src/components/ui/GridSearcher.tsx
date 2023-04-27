@@ -2,12 +2,43 @@ import { Coordinate, Grid } from './Grid';
 import { Button } from './Button';
 import { useGridBFSDFS } from '../hooks/useGridBFSDFS';
 import { coordinateInArray, coordinatesEqual } from '../../helpers';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export function GridSearcher () {
     const [placingWalls, setPlacingWalls] = useState(true)
     const [movingElement, setMovingElement] = useState<'start' | 'end' | undefined>()
     const [searchMode, setSearchMode] = useState<'BFS'|'DFS'>('BFS')
+    const [lockAspect, setLockAspect] = useState(true)
+    const gridSpaceRef = useRef<HTMLDivElement>(null)
+
+    const {
+        searched,
+        currSearching,
+        isSearching,
+        start,
+        path,
+        end,
+        width,
+        height,
+        startSearch,
+        setStart,
+        setEnd,
+        setHeight,
+        setWidth,
+        setWalls,
+        clearSearched,
+        walls,
+    } = useGridBFSDFS(searchMode, 40, 15, {x:0, y:0}, {x:9, y:9}, [], 10)
+
+    useEffect(() => {
+        if (gridSpaceRef.current === null || !lockAspect) {
+            return
+        }
+        const requiredRatio = gridSpaceRef.current.offsetWidth / gridSpaceRef.current.offsetHeight
+        const newHeight = Math.floor(1 / (requiredRatio / width))
+        setHeight(newHeight)
+    }, [gridSpaceRef, lockAspect, width])
+
 
     const handleBrush = (position: Coordinate) => {
         if (movingElement || isSearching) {
@@ -42,24 +73,6 @@ export function GridSearcher () {
         }
     }
 
-    const {
-        searched,
-        currSearching,
-        isSearching,
-        start,
-        path,
-        end,
-        width,
-        height,
-        startSearch,
-        setStart,
-        setEnd,
-        setHeight,
-        setWidth,
-        setWalls,
-        walls,
-    } = useGridBFSDFS(searchMode, 45, 20, {x:0, y:0}, {x:9, y:9}, [], 10)
-
     return (
         <div
             className='flex flex-col gap-2 p-4 h-screen'
@@ -92,25 +105,43 @@ export function GridSearcher () {
                 <label htmlFor="range" className='flex flex-col justify-center items-center'>
                     {`Height: ${height}`}
                     <input
+                        disabled={lockAspect}
                         value={height}
                         onChange={(e) => setHeight(parseInt(e.target.value))}
                         type="range" id="range" min={5} max={50} step={1}/>
                 </label>
+                <label htmlFor="lockAspect" className='flex flex-col items-center'>
+                    Lock Aspect
+                    <input type="checkbox" checked={lockAspect} onChange={(e) => setLockAspect(e.currentTarget.checked)}/>
+                </label>
             </div>
-            <Grid
-                onCellClick={handleCellClick}
-                className='max-h-full overflow-auto'
-                onMouseActiveOverCell={handleBrush}
-                movingElement={movingElement}
-                width={width}
-                height={height}
-                start={start}
-                end={end}
-                walls={walls}
-                currSearching={currSearching}
-                searched={searched}
-                path={path}
-            />
+            <div ref={gridSpaceRef} className="grow max-h-full overflow-auto">
+                <Grid
+                    onCellClick={handleCellClick}
+                    onMouseActiveOverCell={handleBrush}
+                    movingElement={movingElement}
+                    width={width}
+                    height={height}
+                    start={start}
+                    end={end}
+                    walls={walls}
+                    currSearching={currSearching}
+                    searched={searched}
+                    path={path}
+                />
+            </div>
+            <div className="flex gap-2">
+                <Button
+                    onClick={() => clearSearched()}
+                >
+                    Clear Path
+                </Button>
+                <Button
+                    onClick={() => setWalls([])}
+                >
+                    Clear Walls
+                </Button>
+            </div>
         </div>
     )
 }

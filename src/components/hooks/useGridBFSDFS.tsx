@@ -35,16 +35,20 @@ export function useGridBFSDFS (
     }, [walls, height, width])
 
     useEffect(() => {
+        // On resize, ensure that start and end points are in the grid
         if (start.x >= width || start.y >= height) {
             setStart({x: 0, y: 0})
+            setWalls(walls.filter(wall => !coordinatesEqual({x: 0, y:0}, wall)))
         }
         if (end.x >= width || end.y >= height) {
             setEnd({x: width - 1, y: height - 1})
+            setWalls(walls.filter(wall => !coordinatesEqual({x: width - 1, y: height - 1}, wall)))
         }
-    }, [width, height, start, end])
+    }, [width, height, start, end, walls])
 
     const clearSearched = () => {
         setSearched([])
+        setPath([])
     }
 
     const startSearch = useCallback(async () => {
