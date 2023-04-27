@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { coordinateInArray, coordinatesEqual } from '../../helpers'
 import { GridCell, GridCellTypes } from './GridCell'
 
@@ -16,17 +16,37 @@ export interface GridProps {
     searched: Coordinate[]
     currSearching?: Coordinate
     path: Coordinate[]
-    onMouseActiveOverCell: (position: Coordinate) => void
     className?: string
+    onMouseActiveOverCell: (position: Coordinate) => void
+    onCellClick?: (position: Coordinate) => void
+    movingElement?: 'start' | 'end'
 }
 
-export function Grid ({width, height, start, end, walls, searched, currSearching, path, onMouseActiveOverCell, className = ''}: GridProps) {
+export function Grid ({
+    width,
+    height,
+    start,
+    end,
+    walls,
+    searched,
+    currSearching,
+    path,
+    onMouseActiveOverCell,
+    className = '',
+    onCellClick,
+    movingElement}: GridProps)
+{
     const [mouseDown, setMouseDown] = useState(false)
-
     const handleMouseOverCell = (coordinate: Coordinate) => {
         if (mouseDown) {
             onMouseActiveOverCell(coordinate)
         }
+    }
+    let hoverClasses = ''
+    if (movingElement === 'start') {
+        hoverClasses = 'hover:bg-blue-300'
+    } else if (movingElement === 'end') {
+        hoverClasses = 'hover:bg-red-300'
     }
 
     const cells: React.ReactNode[] = []
@@ -46,13 +66,14 @@ export function Grid ({width, height, start, end, walls, searched, currSearching
                 type = 'path'
             } else if (coordinateInArray(searched, currCoordiante)) {
                 type = 'searched'
-
             }
             cells.push(<GridCell
                 x={j}
                 y={i}
-                onMouseDown={() => onMouseActiveOverCell(currCoordiante)}
+                onClick={onCellClick ? () => onCellClick(currCoordiante) : undefined}
+                onMouseDown={type === 'empty' || type === 'wall' ? () => onMouseActiveOverCell(currCoordiante) : undefined}
                 onMouseOver={() => handleMouseOverCell(currCoordiante)}
+                className={hoverClasses}
                 type={type}
                 key={`${j} ${i}`}/>
             )

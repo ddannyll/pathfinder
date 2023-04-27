@@ -8,9 +8,10 @@ interface GridCellProps {
     type?: GridCellTypes
     onMouseOver?: () => void
     onMouseDown?: () => void
+    onClick?: () => void
 }
 
-export function GridCell({children, className = '', type = 'empty', onMouseOver, onMouseDown, x, y}: GridCellProps) {
+export function GridCell({children, className = '', type = 'empty', onMouseOver, onMouseDown, onClick, x, y}: GridCellProps) {
     let styleClasses = ''
     if (type === 'empty') {
         styleClasses = 'bg-zinc-50'
@@ -31,6 +32,7 @@ export function GridCell({children, className = '', type = 'empty', onMouseOver,
     return <div
         data-x={x}
         data-y={y}
+        onClick={onClick}
         onMouseDown={onMouseDown}
         onMouseOver={onMouseOver}
         className={`border aspect-square ${styleClasses} ${className}`}>

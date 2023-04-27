@@ -6,10 +6,11 @@ import { useState } from 'react';
 
 export function GridSearcher () {
     const [placingWalls, setPlacingWalls] = useState(true)
+    const [movingElement, setMovingElement] = useState<'start' | 'end' | undefined>()
     const [searchMode, setSearchMode] = useState<'BFS'|'DFS'>('BFS')
 
     const handleBrush = (position: Coordinate) => {
-        if (isSearching) {
+        if (movingElement || isSearching) {
             return
         }
         if (placingWalls) {
@@ -18,6 +19,26 @@ export function GridSearcher () {
             }
         } else {
             setWalls(walls.filter(curr => !coordinatesEqual(curr, position)))
+        }
+    }
+
+    const handleCellClick = (position: Coordinate) => {
+        if (isSearching) {
+            return
+        }
+        if (movingElement === 'start') {
+            setStart(position)
+            setMovingElement(undefined)
+            setWalls(walls.filter(wall => !coordinatesEqual(wall, position)))
+        } else if (movingElement === 'end') {
+            setEnd(position)
+            setMovingElement(undefined)
+            setWalls(walls.filter(wall => !coordinatesEqual(wall, position)))
+        } else if (coordinatesEqual(end, position)) {
+            setMovingElement('end')
+        } else if (coordinatesEqual(start, position)) {
+            setMovingElement('start')
+
         }
     }
 
@@ -31,6 +52,8 @@ export function GridSearcher () {
         width,
         height,
         startSearch,
+        setStart,
+        setEnd,
         setHeight,
         setWidth,
         setWalls,
@@ -75,8 +98,10 @@ export function GridSearcher () {
                 </label>
             </div>
             <Grid
+                onCellClick={handleCellClick}
                 className='max-h-full overflow-auto'
                 onMouseActiveOverCell={handleBrush}
+                movingElement={movingElement}
                 width={width}
                 height={height}
                 start={start}

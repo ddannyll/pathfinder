@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { coordinateInArray, coordinatesEqual } from '../../helpers'
+import { coordinatesEqual } from '../../helpers'
 import { Coordinate } from '../ui/Grid'
 import { Deque } from '../dataStructures/deque'
 
@@ -41,7 +41,7 @@ export function useGridBFSDFS (
         if (end.x >= width || end.y >= height) {
             setEnd({x: width - 1, y: height - 1})
         }
-    }, [width, height])
+    }, [width, height, start, end])
 
     const clearSearched = () => {
         setSearched([])
@@ -104,7 +104,7 @@ export function useGridBFSDFS (
         }
 
         setIsSearching(false)
-    }, [start, end, width, height, wallMatrix, mode])
+    }, [start, end, width, height, wallMatrix, mode, delay])
 
     return {
         width,
