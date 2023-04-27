@@ -8,10 +8,11 @@ interface GridCellProps {
     type?: GridCellTypes
     onMouseOver?: () => void
     onMouseDown?: () => void
+    onMouseUp?: () => void
     onClick?: () => void
 }
 
-export function GridCell({children, className = '', type = 'empty', onMouseOver, onMouseDown, onClick, x, y}: GridCellProps) {
+export function GridCell({children, className = '', type = 'empty', onMouseOver, onMouseDown, onClick, onMouseUp, x, y}: GridCellProps) {
     let styleClasses = ''
     if (type === 'empty') {
         styleClasses = 'bg-zinc-50'
@@ -20,7 +21,7 @@ export function GridCell({children, className = '', type = 'empty', onMouseOver,
     } else if (type === 'start') {
         styleClasses = 'bg-blue-500'
     } else if (type === 'wall') {
-        styleClasses = 'bg-zinc-700'
+        styleClasses = 'bg-zinc-700 transition'
     } else if (type === 'searched') {
         styleClasses = 'bg-zinc-300 transition'
     } else if (type === 'end') {
@@ -33,7 +34,13 @@ export function GridCell({children, className = '', type = 'empty', onMouseOver,
         data-x={x}
         data-y={y}
         onClick={onClick}
-        onMouseDown={onMouseDown}
+        onMouseDown={(e) => {
+            e.preventDefault()
+            if (onMouseDown) {
+                onMouseDown()
+            }
+        }}
+        onMouseUp={onMouseUp}
         onMouseOver={onMouseOver}
         className={`border aspect-square ${styleClasses} ${className}`}>
         {children}

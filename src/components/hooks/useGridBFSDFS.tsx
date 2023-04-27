@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { coordinatesEqual } from '../../helpers'
+import { coordinateInArray, coordinatesEqual } from '../../helpers'
 import { Coordinate } from '../ui/Grid'
 import { Deque } from '../dataStructures/deque'
 
@@ -11,7 +11,8 @@ export function useGridBFSDFS (
     initialStart: Coordinate,
     initialEnd:Coordinate,
     initialWalls: Coordinate[],
-    delay: number) {
+    delay: number)
+{
 
     const [currSearching, setCurrSearching] = useState<Coordinate|undefined>(undefined)
     const [searched, setSearched] = useState<Coordinate[]>([])
@@ -45,6 +46,16 @@ export function useGridBFSDFS (
             setWalls(walls.filter(wall => !coordinatesEqual({x: width - 1, y: height - 1}, wall)))
         }
     }, [width, height, start, end, walls])
+
+    useEffect(() => {
+        // effect to prevent overlapping walls with start / end cells
+        if (coordinateInArray(walls, start)) {
+            setWalls(walls.filter(wall => !coordinatesEqual(start, wall)))
+        }
+        if (coordinateInArray(walls, end)) {
+            setWalls(walls.filter(wall => !coordinatesEqual(end, wall)))
+        }
+    }, [walls, start, end, setStart])
 
     const clearSearched = () => {
         setSearched([])
