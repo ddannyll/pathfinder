@@ -3,6 +3,12 @@ import { coordinateInArray, coordinatesEqual } from '../../helpers'
 import { Coordinate } from '../ui/Grid'
 import { Deque } from '../dataStructures/deque'
 
+export interface FSStep {
+    step: number
+    visited: Coordinate[]
+    curr: Coordinate[]
+    path: Coordinate[]
+}
 
 export function useGridBFSDFS (
     mode: 'BFS' | 'DFS',
