@@ -27,10 +27,12 @@ export function useGridBFSDFS (
         // Used to optimise algorithm
         const matrix: boolean[][] = Array.from(Array(height), () => new Array(width))
         for (const {x, y} of walls) {
-            matrix[y][x] = true
+            if (x >= 0 && y >= 0 && x < width && y < height) {
+                matrix[y][x] = true
+            }
         }
         return matrix
-    }, [walls])
+    }, [walls, height, width])
 
     useEffect(() => {
         if (start.x >= width || start.y >= height) {
