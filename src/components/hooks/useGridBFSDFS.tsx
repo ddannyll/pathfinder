@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { coordinateInArray, coordinatesEqual } from '../../helpers'
 import { Coordinate } from '../ui/Grid'
+import { Deque } from '../dataStructures/deque'
 
 
 export function useGridBFSDFS (
@@ -21,6 +22,15 @@ export function useGridBFSDFS (
     const [start, setStart] = useState(initialStart)
     const [end, setEnd] = useState(initialEnd)
     const [walls, setWalls] = useState(initialWalls)
+
+    const wallMatrix = useMemo(() => {
+        // Used to optimise algorithm
+        const matrix: boolean[][] = Array.from(Array(height), () => new Array(width))
+        for (const {x, y} of walls) {
+            matrix[y][x] = true
+        }
+        return matrix
+    }, [walls])
 
     useEffect(() => {
         if (start.x >= width || start.y >= height) {
@@ -44,18 +54,22 @@ export function useGridBFSDFS (
             prev: null | Coordinate
         }
 
-        const queue: positionAndPrevious[] = [{curr: start, prev: null}]
-        const visited: Coordinate[] = []
+        const deque = new Deque<positionAndPrevious>()
+        deque.pushLeft({curr: start, prev: null})
+
+        const visitedArray: Coordinate[] = []
+        const visitedMatrix: boolean[][] = Array.from(Array(height), () => new Array(width))
         const pathMatrix: Coordinate[][] = Array.from(Array(height), () => new Array(width)) // 2D array
 
-        while (queue.length > 0) {
-            const {curr, prev} = mode === 'BFS' ? queue.shift() as positionAndPrevious: queue.pop() as positionAndPrevious
-            if (coordinateInArray(visited, curr)) {
+        while (!deque.isEmpty()) {
+            const {curr, prev} = mode === 'BFS' ? deque.popLeft() as positionAndPrevious: deque.popRight() as positionAndPrevious
+            if (visitedMatrix[curr.y][curr.x]) {
                 continue
             }
             await new Promise(resolve => setTimeout(resolve, delay));
-            visited.push(curr)
-            setSearched(visited)
+            visitedMatrix[curr.y][curr.x] = true
+            visitedArray.push(curr)
+            setSearched(visitedArray)
             setCurrSearching(curr)
             if (prev !== null) {
                 pathMatrix[curr.y][curr.x] = prev
@@ -70,9 +84,9 @@ export function useGridBFSDFS (
                 { ...curr,   y: curr.y + 1 },
             ]
             neighbors = neighbors.filter(pos => pos.x >= 0 && pos.x < width && pos.y >= 0 && pos.y < height)
-            neighbors = neighbors.filter(pos => !coordinateInArray(walls, pos))
+            neighbors = neighbors.filter(pos => !wallMatrix[pos.y][pos.x])
             for (const neighbor of neighbors) {
-                queue.push({curr: neighbor, prev:curr})
+                deque.pushRight({curr: neighbor, prev:curr})
             }
         }
 
@@ -88,7 +102,7 @@ export function useGridBFSDFS (
         }
 
         setIsSearching(false)
-    }, [start, end, width, height, walls])
+    }, [start, end, width, height, wallMatrix, mode])
 
     return {
         width,
