@@ -124,7 +124,7 @@ export function Grid ({
                 x={j}
                 y={i}
                 type={type}
-                key={`${j} ${i}`}/>
+                key={`${j} ${i}`} />
             )
         }
     }

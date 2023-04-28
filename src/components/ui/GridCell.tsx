@@ -14,20 +14,22 @@ interface GridCellProps {
 
 export function GridCell({children, className = '', type = 'empty', onMouseOver, onMouseDown, onClick, onMouseUp, x, y}: GridCellProps) {
     let styleClasses = ''
-    if (type === 'empty') {
-        styleClasses = 'bg-zinc-50'
-    } else if (type === 'current') {
-        styleClasses = 'bg-amber-300'
-    } else if (type === 'start') {
-        styleClasses = 'bg-blue-500'
-    } else if (type === 'wall') {
-        styleClasses = 'bg-zinc-700 transition'
-    } else if (type === 'searched') {
-        styleClasses = 'bg-zinc-300 transition'
-    } else if (type === 'end') {
-        styleClasses = 'bg-red-500'
-    } else if (type === 'path') {
-        styleClasses = 'bg-green-400 transition'
+    if (!className) {
+        if (type === 'empty') {
+            styleClasses = 'bg-zinc-50'
+        } else if (type === 'current') {
+            styleClasses = 'bg-amber-300'
+        } else if (type === 'start') {
+            styleClasses = 'bg-blue-500'
+        } else if (type === 'wall') {
+            styleClasses = 'bg-zinc-700 transition'
+        } else if (type === 'searched') {
+            styleClasses = 'bg-zinc-300 transition'
+        } else if (type === 'end') {
+            styleClasses = 'bg-red-500'
+        } else if (type === 'path') {
+            styleClasses = 'bg-green-400 transition'
+        }
     }
 
     return <div
