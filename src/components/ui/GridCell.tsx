@@ -22,7 +22,7 @@ export function GridCell({children, className = '', type = 'empty', onMouseOver,
         } else if (type === 'start') {
             styleClasses = 'bg-blue-500'
         } else if (type === 'wall') {
-            styleClasses = 'bg-zinc-700 transition'
+            styleClasses = 'bg-zinc-700'
         } else if (type === 'searched') {
             styleClasses = 'bg-zinc-300 transition'
         } else if (type === 'end') {

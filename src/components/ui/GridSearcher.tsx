@@ -1,6 +1,6 @@
 import { Grid } from './Grid';
 import { Button } from './Button';
-import { useGridBFSDFS } from '../hooks/useGridBFSDFS';
+import { FSResult, FSStep, useGridBFSDFS } from '../hooks/useGridBFSDFS';
 import { useEffect, useRef, useState } from 'react';
 
 export function GridSearcher () {
@@ -8,25 +8,24 @@ export function GridSearcher () {
     const [lockAspect, setLockAspect] = useState(true)
     const gridSpaceRef = useRef<HTMLDivElement>(null)
     const [delay, setDelay] = useState(20)
+    const [searchResult, setSearchResult] = useState<FSResult>()
+    const [currStep, setCurrStep] = useState(0)
+    const [currPathStep, setCurrPathStep] = useState(0)
+    const [autoProgress, setAutoProgress] = useState(false)
 
     const {
-        searched,
-        currSearching,
-        isSearching,
         start,
-        path,
         end,
         width,
         height,
         walls,
-        startSearch,
+        getSearchResult,
         setStart,
         setEnd,
         setHeight,
         setWidth,
         setWalls,
-        clearSearched,
-    } = useGridBFSDFS(searchMode, 25, 12, {x:0, y:0}, {x:9, y:9}, [], delay)
+    } = useGridBFSDFS(searchMode, 25, 12, {x:0, y:0}, {x:9, y:9}, [])
 
     useEffect(() => {
         if (gridSpaceRef.current === null || !lockAspect) {
@@ -37,12 +36,36 @@ export function GridSearcher () {
         setHeight(newHeight)
     }, [gridSpaceRef, lockAspect, width, setHeight])
 
+    useEffect(() => {
+        if (!autoProgress || !searchResult) {
+            return
+        }
+        if (currStep < searchResult.steps.length - 1) {
+            setTimeout(() => {setCurrStep(currStep + 1)}, delay)
+        } else if (currPathStep < searchResult.path.length - 1) {
+            setTimeout(() => {setCurrPathStep(currPathStep + 1)}, delay)
+        } else {
+            setAutoProgress(false)
+        }
+    }, [currStep, currPathStep, searchResult, delay, autoProgress])
+
+    const startAutoSearch = () => {
+        setAutoProgress(true)
+        setCurrStep(0)
+        setCurrPathStep(0)
+        setSearchResult(getSearchResult())
+    }
+
     return (
         <div
             className='flex flex-col gap-2 p-4 h-screen'
         >
             <div className="flex gap-2">
-                <Button disabled={isSearching} onClick={() => startSearch()}>Search</Button>
+                <Button
+                    onClick={autoProgress ? () => setAutoProgress(false) : startAutoSearch }
+                >
+                    {autoProgress ? 'Stop Search' : 'Start Search'}
+                </Button>
                 <Button
                     onClick={() => setSearchMode(searchMode === 'BFS' ? 'DFS' : 'BFS')}
                 >
@@ -82,9 +105,9 @@ export function GridSearcher () {
                     start={start}
                     end={end}
                     walls={walls}
-                    currSearching={currSearching}
-                    searched={searched}
-                    path={path}
+                    currSearching={searchResult?.steps[currStep].curr}
+                    searched={searchResult?.visited.slice(0, searchResult?.steps[currStep].visitedIndex)}
+                    path={searchResult?.path.slice(0, currPathStep)}
                     setStart={setStart}
                     setEnd={setEnd}
                     setWalls={setWalls}
@@ -92,7 +115,7 @@ export function GridSearcher () {
             </div>
             <div className="flex gap-2">
                 <Button
-                    onClick={() => clearSearched()}
+                    // onClick={() => clearSearched()}
                 >
                     Clear Path
                 </Button>

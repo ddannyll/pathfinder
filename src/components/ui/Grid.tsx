@@ -13,9 +13,9 @@ export interface GridProps {
     start: Coordinate
     end: Coordinate
     walls: Coordinate[]
-    searched: Coordinate[]
+    searched?: Coordinate[]
     currSearching?: Coordinate
-    path: Coordinate[]
+    path?: Coordinate[]
     className?: string
     setStart: React.Dispatch<Coordinate>
     setEnd: React.Dispatch<Coordinate>
@@ -101,9 +101,9 @@ export function Grid ({
                 type = 'end'
             } else if (coordinateInArray(walls, currCoordiante)) {
                 type = 'wall'
-            } else if (coordinateInArray(path, currCoordiante)) {
+            } else if (path && coordinateInArray(path, currCoordiante)) {
                 type = 'path'
-            } else if (coordinateInArray(searched, currCoordiante)) {
+            } else if (searched && coordinateInArray(searched, currCoordiante)) {
                 type = 'searched'
             }
 

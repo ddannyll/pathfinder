@@ -3,12 +3,30 @@ import { coordinateInArray, coordinatesEqual } from '../../helpers'
 import { Coordinate } from '../ui/Grid'
 import { Deque } from '../dataStructures/deque'
 
-export interface FSStep {
-    step: number
+export interface FSResult {
+    mode: 'BFS' | 'DFS'
+    found: boolean
     visited: Coordinate[]
-    curr: Coordinate[]
+    steps: FSStep[]
     path: Coordinate[]
 }
+
+
+export interface FSStep {
+    curr: Coordinate
+    prev: Coordinate | null
+    currStatus: 'visited' | 'new' | 'target'
+    visitedIndex: number
+    neighbors: Coordinate[]
+    suitableNeighbors: Coordinate[]
+    deque: Coordinate[]
+}
+
+export interface FSPathStep {
+    pathIndex: number
+}
+
+
 
 export function useGridBFSDFS (
     mode: 'BFS' | 'DFS',
@@ -17,13 +35,8 @@ export function useGridBFSDFS (
     initialStart: Coordinate,
     initialEnd:Coordinate,
     initialWalls: Coordinate[],
-    delay: number)
-{
+) {
 
-    const [currSearching, setCurrSearching] = useState<Coordinate|undefined>(undefined)
-    const [searched, setSearched] = useState<Coordinate[]>([])
-    const [isSearching, setIsSearching] = useState(false)
-    const [path, setPath] = useState<Coordinate[]>([])
     const [width, setWidth] = useState(initialWidth)
     const [height, setHeight] = useState(initialHeight)
     const [start, setStart] = useState(initialStart)
@@ -63,41 +76,50 @@ export function useGridBFSDFS (
         }
     }, [walls, start, end, setStart])
 
-    const clearSearched = () => {
-        setSearched([])
-        setPath([])
-    }
 
-    const startSearch = useCallback(async () => {
-        setIsSearching(true)
-        setPath([])
+    const getSearchResult = useCallback(() => {
+        const searchResult: FSResult = {
+            found: false,
+            mode,
+            visited: [],
+            steps: [],
+            path: [],
+        }
 
-        interface positionAndPrevious {
+        interface PositionAndPrevious {
             curr: Coordinate,
             prev: null | Coordinate
         }
-
-        const deque = new Deque<positionAndPrevious>()
-        deque.pushLeft({curr: start, prev: null})
-
+        const deque = new Deque<PositionAndPrevious>()
+        deque.pushLeft({curr: start, prev:null})
         const visitedArray: Coordinate[] = []
-        const visitedMatrix: boolean[][] = Array.from(Array(height), () => new Array(width))
-        const pathMatrix: Coordinate[][] = Array.from(Array(height), () => new Array(width)) // 2D array
+        const visitedMatrix: boolean[][] = Array.from(Array(height), () => new Array(width))// 2D array
+        const pathMatrix: Coordinate[][] = Array.from(Array(height), () => new Array(width))
 
         while (!deque.isEmpty()) {
-            const {curr, prev} = mode === 'BFS' ? deque.popLeft() as positionAndPrevious: deque.popRight() as positionAndPrevious
+            const {curr, prev} = mode === 'BFS' ? deque.popLeft() as PositionAndPrevious: deque.popRight() as PositionAndPrevious
+            const currStep: FSStep = {
+                curr,
+                prev,
+                neighbors: [],
+                suitableNeighbors:[],
+                currStatus: 'new',
+                visitedIndex: visitedArray.length,
+                deque: [...(deque.getValues()).map(posPrev => posPrev.curr)],
+            }
+            searchResult.steps.push(currStep)
             if (visitedMatrix[curr.y][curr.x]) {
+                currStep.currStatus = 'visited'
                 continue
             }
-            await new Promise(resolve => setTimeout(resolve, delay));
             visitedMatrix[curr.y][curr.x] = true
             visitedArray.push(curr)
-            setSearched(visitedArray)
-            setCurrSearching(curr)
             if (prev !== null) {
                 pathMatrix[curr.y][curr.x] = prev
             }
             if (coordinatesEqual(curr, end)) {
+                currStep.currStatus = 'target'
+                searchResult.found = true
                 break
             }
             let neighbors = [
@@ -107,25 +129,25 @@ export function useGridBFSDFS (
                 { ...curr,   y: curr.y + 1 },
             ]
             neighbors = neighbors.filter(pos => pos.x >= 0 && pos.x < width && pos.y >= 0 && pos.y < height)
-            neighbors = neighbors.filter(pos => !wallMatrix[pos.y][pos.x])
+            currStep.neighbors = [...neighbors]
+            neighbors = neighbors.filter(pos => !wallMatrix[pos.y][pos.x] && !visitedMatrix[pos.y][pos.x])
+            currStep.suitableNeighbors = [...neighbors]
             for (const neighbor of neighbors) {
                 deque.pushRight({curr: neighbor, prev:curr})
             }
         }
+        searchResult.visited = visitedArray
 
         // backtrack
         let curr = pathMatrix[end.y][end.x]
-        const tempPath = [curr]
+        searchResult.path.push(curr)
         while (curr && !coordinatesEqual(curr, start)) {
-            setCurrSearching(undefined)
-            await new Promise(resolve => setTimeout(resolve, delay));
-            setPath([...tempPath])
             curr = pathMatrix[curr.y][curr.x]
-            tempPath.push(curr)
+            searchResult.path.push(curr)
         }
+        return searchResult
+    }, [start, end, width, height, wallMatrix, mode])
 
-        setIsSearching(false)
-    }, [start, end, width, height, wallMatrix, mode, delay])
 
     return {
         width,
@@ -133,12 +155,7 @@ export function useGridBFSDFS (
         walls,
         start,
         end,
-        searched,
-        path,
-        currSearching,
-        isSearching,
-        startSearch,
-        clearSearched,
+        getSearchResult,
         setWidth,
         setHeight,
         setWalls,
