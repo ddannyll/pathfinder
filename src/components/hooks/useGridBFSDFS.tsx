@@ -123,10 +123,10 @@ export function useGridBFSDFS (
                 break
             }
             let neighbors = [
+                { ...curr,   y: curr.y + 1 },
                 { ...curr,   x: curr.x + 1 },
                 { ...curr,   y: curr.y - 1 },
                 { ...curr,   x: curr.x - 1 },
-                { ...curr,   y: curr.y + 1 },
             ]
             neighbors = neighbors.filter(pos => pos.x >= 0 && pos.x < width && pos.y >= 0 && pos.y < height)
             currStep.neighbors = [...neighbors]

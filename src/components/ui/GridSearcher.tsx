@@ -13,6 +13,7 @@ export function GridSearcher() {
     const [currPathStep, setCurrPathStep] = useState(0)
     const [autoProgress, setAutoProgress] = useState(false)
     const [autoTimeout, setAutoTimeout] = useState<ReturnType<typeof setTimeout>>()
+    const [enableVisitedSteps, setEnabledVisitedSteps] = useState(false)
 
     const {
         start,
@@ -28,6 +29,22 @@ export function GridSearcher() {
         setWalls,
     } = useGridBFSDFS(searchMode, 25, 12, { x: 0, y: 0 }, { x: 9, y: 9 }, [])
 
+    const filteredSteps = useMemo(() => {
+        return searchResult?.steps.filter(step => step.currStatus !== 'visited' || enableVisitedSteps) || []
+    }, [searchResult, enableVisitedSteps])
+
+    const searchState = useMemo<'idle' | 'search' | 'backtrack' | 'done'>(() => {
+        if (currStep === 0 || !searchResult) {
+            return 'idle'
+        } else if (currStep < filteredSteps.length - 1) {
+            return 'search'
+        } else if (currPathStep < searchResult?.path.length - 1) {
+            return 'backtrack'
+        } else {
+            return 'done'
+        }
+    }, [currStep, searchResult, filteredSteps.length, currPathStep])
+
     useEffect(() => {
         if (gridSpaceRef.current === null || !lockAspect) {
             return
@@ -36,18 +53,6 @@ export function GridSearcher() {
         const newHeight = Math.floor(1 / (requiredRatio / width))
         setHeight(newHeight)
     }, [gridSpaceRef, lockAspect, width, setHeight])
-
-    const searchState = useMemo<'idle' | 'search' | 'backtrack' | 'done'>(() => {
-        if (currStep === 0 || !searchResult) {
-            return 'idle'
-        } else if (currStep < searchResult.steps.length - 1) {
-            return 'search'
-        } else if (currPathStep < searchResult.path.length - 1) {
-            return 'backtrack'
-        } else {
-            return 'done'
-        }
-    }, [currStep, currPathStep, searchResult])
 
     useEffect(() => {
         if (!autoProgress || !searchResult) {
@@ -107,7 +112,6 @@ export function GridSearcher() {
                         setCurrPathStep(0)
                         setCurrStep(0)
                     }}
-                // disabled={autoProgress}
                 >
                     Clear Path
                 </Button>
@@ -135,6 +139,18 @@ export function GridSearcher() {
                     Lock Aspect
                     <input type="checkbox" checked={lockAspect} onChange={(e) => setLockAspect(e.currentTarget.checked)} />
                 </label>
+                <label htmlFor="lockAspect" className='flex flex-col items-center'>
+                    Enable visited steps
+                    <input type="checkbox" checked={enableVisitedSteps}
+                        onChange={() => {
+                            clearTimeout(autoTimeout)
+                            setAutoProgress(false)
+                            setCurrStep(0)
+                            setCurrPathStep(0)
+                            setEnabledVisitedSteps(!enableVisitedSteps)
+                        }}
+                    />
+                </label>
                 <label htmlFor="range" className='flex flex-col justify-center items-center'>
                     {`Delay: ${delay}`}
                     <input
@@ -145,13 +161,15 @@ export function GridSearcher() {
             </div>
             <div ref={gridSpaceRef} className="grow max-h-full overflow-auto">
                 <Grid
+                    disableInteractions={searchState === 'search' || searchState === 'backtrack'}
                     width={width}
                     height={height}
                     start={start}
                     end={end}
                     walls={walls}
-                    currSearching={currStep !== 0 ? searchResult?.steps[currStep].curr : undefined}
-                    searched={searchResult?.visited.slice(0, searchResult?.steps[currStep].visitedIndex)}
+                    currSearching={currStep !== 0 ? filteredSteps[currStep].curr : undefined}
+                    currSearchingVisited={filteredSteps.length > 0 && filteredSteps[currStep].currStatus === 'visited'}
+                    searched={searchResult?.visited.slice(0, filteredSteps[currStep].visitedIndex)}
                     path={searchResult?.path.slice(0, currPathStep)}
                     setStart={setStart}
                     setEnd={setEnd}

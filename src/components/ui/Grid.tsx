@@ -15,8 +15,10 @@ export interface GridProps {
     walls: Coordinate[]
     searched?: Coordinate[]
     currSearching?: Coordinate
+    currSearchingVisited?: boolean
     path?: Coordinate[]
     className?: string
+    disableInteractions?: boolean
     setStart: React.Dispatch<Coordinate>
     setEnd: React.Dispatch<Coordinate>
     setWalls: React.Dispatch<Coordinate[]>
@@ -31,7 +33,9 @@ export function Grid ({
     walls,
     searched,
     currSearching,
+    currSearchingVisited,
     path,
+    disableInteractions = false,
     className = '',
     setStart,
     setEnd,
@@ -43,7 +47,7 @@ export function Grid ({
     const [placing, setPlacing] = useState<'start' | 'end' | null>(null)
 
     useEffect(() => {
-        if (!brushing || !overCell || placing) {
+        if (!brushing || !overCell || placing || disableInteractions) {
             return
         }
         if (brushingWalls) {
@@ -55,13 +59,16 @@ export function Grid ({
                 setWalls(walls.filter(wall => !coordinatesEqual(wall, overCell)))
             }
         }
-    }, [brushing, brushingWalls, setWalls, walls, overCell, placing])
+    }, [brushing, brushingWalls, setWalls, walls, overCell, placing, disableInteractions])
 
     const handleMouseOverCell = useCallback((cellPosition: Coordinate) => {
         setOverCell(cellPosition)
     }, [])
 
     const handleMouseDownCell = useCallback((cellPosition: Coordinate) => {
+        if (disableInteractions) {
+            return
+        }
         if (coordinatesEqual(cellPosition, start)) {
             setPlacing('start')
         } else if (coordinatesEqual(cellPosition, end)) {
@@ -74,7 +81,7 @@ export function Grid ({
                 setBrushingWalls(false)
             }
         }
-    }, [walls, start, end])
+    }, [walls, start, end, disableInteractions])
 
     const handleMouseUpCell = useCallback((cellPosition: Coordinate) => {
         setBrushing(false)
@@ -95,6 +102,9 @@ export function Grid ({
             let type: GridCellTypes = 'empty'
             if (currSearching && coordinatesEqual(currSearching, currCoordiante)) {
                 type = 'current'
+                if (currSearchingVisited) {
+                    type = 'currentVisited'
+                }
             } else if (coordinatesEqual(start, currCoordiante)) {
                 type = 'start'
             } else if (coordinatesEqual(end, currCoordiante)) {
