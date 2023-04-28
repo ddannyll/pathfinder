@@ -1,6 +1,6 @@
 import { Grid } from './Grid';
 import { Button } from './Button';
-import { FSResult, FSStep, useGridBFSDFS } from '../hooks/useGridBFSDFS';
+import { FSResult, useGridBFSDFS } from '../hooks/useGridBFSDFS';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 export function GridSearcher() {
