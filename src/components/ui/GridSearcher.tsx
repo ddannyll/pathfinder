@@ -1,10 +1,10 @@
 import { Grid } from './Grid';
 import { Button } from './Button';
 import { FSResult, FSStep, useGridBFSDFS } from '../hooks/useGridBFSDFS';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-export function GridSearcher () {
-    const [searchMode, setSearchMode] = useState<'BFS'|'DFS'>('BFS')
+export function GridSearcher() {
+    const [searchMode, setSearchMode] = useState<'BFS' | 'DFS'>('BFS')
     const [lockAspect, setLockAspect] = useState(true)
     const gridSpaceRef = useRef<HTMLDivElement>(null)
     const [delay, setDelay] = useState(20)
@@ -12,6 +12,7 @@ export function GridSearcher () {
     const [currStep, setCurrStep] = useState(0)
     const [currPathStep, setCurrPathStep] = useState(0)
     const [autoProgress, setAutoProgress] = useState(false)
+    const [autoTimeout, setAutoTimeout] = useState<ReturnType<typeof setTimeout>>()
 
     const {
         start,
@@ -25,7 +26,7 @@ export function GridSearcher () {
         setHeight,
         setWidth,
         setWalls,
-    } = useGridBFSDFS(searchMode, 25, 12, {x:0, y:0}, {x:9, y:9}, [])
+    } = useGridBFSDFS(searchMode, 25, 12, { x: 0, y: 0 }, { x: 9, y: 9 }, [])
 
     useEffect(() => {
         if (gridSpaceRef.current === null || !lockAspect) {
@@ -36,18 +37,30 @@ export function GridSearcher () {
         setHeight(newHeight)
     }, [gridSpaceRef, lockAspect, width, setHeight])
 
+    const searchState = useMemo<'idle' | 'search' | 'backtrack' | 'done'>(() => {
+        if (currStep === 0 || !searchResult) {
+            return 'idle'
+        } else if (currStep < searchResult.steps.length - 1) {
+            return 'search'
+        } else if (currPathStep < searchResult.path.length - 1) {
+            return 'backtrack'
+        } else {
+            return 'done'
+        }
+    }, [currStep, currPathStep, searchResult])
+
     useEffect(() => {
         if (!autoProgress || !searchResult) {
             return
         }
-        if (currStep < searchResult.steps.length - 1) {
-            setTimeout(() => {setCurrStep(currStep + 1)}, delay)
-        } else if (currPathStep < searchResult.path.length - 1) {
-            setTimeout(() => {setCurrPathStep(currPathStep + 1)}, delay)
+        if (searchState === 'idle' || searchState === 'search') {
+            setAutoTimeout(setTimeout(() => { setCurrStep(currStep + 1) }, delay))
+        } else if (searchState === 'backtrack') {
+            setAutoTimeout(setTimeout(() => { setCurrPathStep(currPathStep + 1) }, delay))
         } else {
             setAutoProgress(false)
         }
-    }, [currStep, currPathStep, searchResult, delay, autoProgress])
+    }, [currStep, currPathStep, searchResult, delay, autoProgress, searchState])
 
     const startAutoSearch = () => {
         setAutoProgress(true)
@@ -56,15 +69,47 @@ export function GridSearcher () {
         setSearchResult(getSearchResult())
     }
 
+    let mainButtonText = ''
+    if (autoProgress) {
+        mainButtonText = 'Pause'
+    } else if (searchState === 'idle') {
+        mainButtonText = 'Search'
+    } else if (searchState === 'done') {
+        mainButtonText = 'Restart'
+    } else {
+        mainButtonText = 'Resume'
+    }
+
     return (
         <div
             className='flex flex-col gap-2 p-4 h-screen'
         >
             <div className="flex gap-2">
                 <Button
-                    onClick={autoProgress ? () => setAutoProgress(false) : startAutoSearch }
+                    onClick={
+                        () => {
+                            if (autoProgress) {
+                                setAutoProgress(false)
+                            } else if (searchState === 'idle' || searchState === 'done') {
+                                startAutoSearch()
+                            } else {
+                                setAutoProgress(true)
+                            }
+                        }
+                    }
                 >
-                    {autoProgress ? 'Stop Search' : 'Start Search'}
+                    {mainButtonText}
+                </Button>
+                <Button
+                    onClick={() => {
+                        clearTimeout(autoTimeout)
+                        setAutoProgress(false)
+                        setCurrPathStep(0)
+                        setCurrStep(0)
+                    }}
+                // disabled={autoProgress}
+                >
+                    Clear Path
                 </Button>
                 <Button
                     onClick={() => setSearchMode(searchMode === 'BFS' ? 'DFS' : 'BFS')}
@@ -76,7 +121,7 @@ export function GridSearcher () {
                     <input
                         value={width}
                         onChange={(e) => setWidth(parseInt(e.target.value))}
-                        type="range" min={5} max={50} step={1}/>
+                        type="range" min={5} max={50} step={1} />
                 </label>
                 <label className='flex flex-col justify-center items-center'>
                     {`Height: ${height}`}
@@ -84,18 +129,18 @@ export function GridSearcher () {
                         disabled={lockAspect}
                         value={height}
                         onChange={(e) => setHeight(parseInt(e.target.value))}
-                        type="range" min={5} max={50} step={1}/>
+                        type="range" min={5} max={50} step={1} />
                 </label>
                 <label htmlFor="lockAspect" className='flex flex-col items-center'>
                     Lock Aspect
-                    <input type="checkbox" checked={lockAspect} onChange={(e) => setLockAspect(e.currentTarget.checked)}/>
+                    <input type="checkbox" checked={lockAspect} onChange={(e) => setLockAspect(e.currentTarget.checked)} />
                 </label>
                 <label htmlFor="range" className='flex flex-col justify-center items-center'>
                     {`Delay: ${delay}`}
                     <input
                         value={delay}
                         onChange={(e) => setDelay(parseInt(e.target.value))}
-                        type="range" min={5} max={250} step={1}/>
+                        type="range" min={5} max={250} step={1} />
                 </label>
             </div>
             <div ref={gridSpaceRef} className="grow max-h-full overflow-auto">
@@ -105,7 +150,7 @@ export function GridSearcher () {
                     start={start}
                     end={end}
                     walls={walls}
-                    currSearching={searchResult?.steps[currStep].curr}
+                    currSearching={currStep !== 0 ? searchResult?.steps[currStep].curr : undefined}
                     searched={searchResult?.visited.slice(0, searchResult?.steps[currStep].visitedIndex)}
                     path={searchResult?.path.slice(0, currPathStep)}
                     setStart={setStart}
@@ -114,11 +159,7 @@ export function GridSearcher () {
                 />
             </div>
             <div className="flex gap-2">
-                <Button
-                    // onClick={() => clearSearched()}
-                >
-                    Clear Path
-                </Button>
+
                 <Button
                     onClick={() => setWalls([])}
                 >
