@@ -50,6 +50,12 @@ export function GridSearcher() {
         setHeight(newHeight)
     }, [gridSpaceRef, lockAspect, width, setHeight])
 
+    useEffect(() => {
+        if (!autoProgress) {
+            clearTimeout(autoTimeout)
+        }
+    }, [autoProgress, autoTimeout])
+
 
     useEffect(() => {
         if (!autoProgress || !searchResult) {
