@@ -117,7 +117,7 @@ export function Grid ({
 
             let children: React.ReactNode
             if (toBeSearched && coordinateInArray(toBeSearched, currCoordiante)) {
-                children = <div className='grid place-content-center h-full bg-green-100' />
+                children = <div className='grid place-content-center h-full bg-green-500/10' />
             }
 
             let placingClasses = ''
