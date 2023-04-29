@@ -13,6 +13,7 @@ export interface GridProps {
     start: Coordinate
     end: Coordinate
     walls: Coordinate[]
+    toBeSearched?:Coordinate[]
     searched?: Coordinate[]
     currSearching?: Coordinate
     currSearchingVisited?: boolean
@@ -33,7 +34,7 @@ export function Grid ({
     walls,
     searched,
     currSearching,
-    currSearchingVisited,
+    toBeSearched,
     path,
     disableInteractions = false,
     className = '',
@@ -102,9 +103,6 @@ export function Grid ({
             let type: GridCellTypes = 'empty'
             if (currSearching && coordinatesEqual(currSearching, currCoordiante)) {
                 type = 'current'
-                if (currSearchingVisited) {
-                    type = 'currentVisited'
-                }
             } else if (coordinatesEqual(start, currCoordiante)) {
                 type = 'start'
             } else if (coordinatesEqual(end, currCoordiante)) {
@@ -115,6 +113,11 @@ export function Grid ({
                 type = 'path'
             } else if (searched && coordinateInArray(searched, currCoordiante)) {
                 type = 'searched'
+            }
+
+            let children: React.ReactNode
+            if (toBeSearched && coordinateInArray(toBeSearched, currCoordiante)) {
+                children = <div className='grid place-content-center h-full bg-green-100' />
             }
 
             let placingClasses = ''
@@ -134,8 +137,9 @@ export function Grid ({
                 x={j}
                 y={i}
                 type={type}
-                key={`${j} ${i}`} />
-            )
+                key={`${j} ${i}`}>
+                {children}
+            </GridCell>)
         }
     }
 

@@ -12,3 +12,8 @@ export function coordinateInArray(coordinateArray: Coordinate[], coordiante: Coo
     }
     return false
 }
+
+export function coordinateInGrid(coordinate: Coordinate, width:number, height:number) {
+    const {x, y} = coordinate
+    return x >= 0 && y >= 0 && x < width && y < height
+}

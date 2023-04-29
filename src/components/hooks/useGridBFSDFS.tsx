@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { coordinateInArray, coordinatesEqual } from '../../helpers'
+import { coordinateInArray, coordinateInGrid, coordinatesEqual } from '../../helpers'
 import { Coordinate } from '../ui/Grid'
 import { Deque } from '../dataStructures/deque'
 
@@ -13,9 +13,8 @@ export interface FSResult {
 
 
 export interface FSStep {
-    curr: Coordinate
+    curr: Coordinate | null
     prev: Coordinate | null
-    currStatus: 'visited' | 'new' | 'target'
     visitedIndex: number
     neighbors: Coordinate[]
     suitableNeighbors: Coordinate[]
@@ -82,7 +81,16 @@ export function useGridBFSDFS (
             found: false,
             mode,
             visited: [],
-            steps: [],
+            steps: [
+                {
+                    curr: null,
+                    prev: null,
+                    neighbors: [],
+                    suitableNeighbors: [],
+                    visitedIndex: 0,
+                    deque: [],
+                },
+            ],
             path: [],
         }
 
@@ -93,48 +101,46 @@ export function useGridBFSDFS (
         const deque = new Deque<PositionAndPrevious>()
         deque.pushLeft({curr: start, prev:null})
         const visitedArray: Coordinate[] = []
+        visitedArray.push(start)
         const visitedMatrix: boolean[][] = Array.from(Array(height), () => new Array(width))// 2D array
+        visitedMatrix[start.y][start.x] = true
         const pathMatrix: Coordinate[][] = Array.from(Array(height), () => new Array(width))
 
         while (!deque.isEmpty()) {
             const {curr, prev} = mode === 'BFS' ? deque.popLeft() as PositionAndPrevious: deque.popRight() as PositionAndPrevious
+
             const currStep: FSStep = {
                 curr,
                 prev,
                 neighbors: [],
                 suitableNeighbors:[],
-                currStatus: 'new',
                 visitedIndex: visitedArray.length,
                 deque: [...(deque.getValues()).map(posPrev => posPrev.curr)],
             }
             searchResult.steps.push(currStep)
-            if (visitedMatrix[curr.y][curr.x]) {
-                currStep.currStatus = 'visited'
-                continue
-            }
-            visitedMatrix[curr.y][curr.x] = true
-            visitedArray.push(curr)
             if (prev !== null) {
                 pathMatrix[curr.y][curr.x] = prev
             }
             if (coordinatesEqual(curr, end)) {
-                currStep.currStatus = 'target'
                 searchResult.found = true
                 break
             }
-            let neighbors = [
+            const neighbors = [
                 { ...curr,   y: curr.y + 1 },
                 { ...curr,   x: curr.x + 1 },
                 { ...curr,   y: curr.y - 1 },
                 { ...curr,   x: curr.x - 1 },
-            ]
-            neighbors = neighbors.filter(pos => pos.x >= 0 && pos.x < width && pos.y >= 0 && pos.y < height)
+            ].filter(n => coordinateInGrid(n, width, height) && !wallMatrix[n.y][n.x])
             currStep.neighbors = [...neighbors]
-            neighbors = neighbors.filter(pos => !wallMatrix[pos.y][pos.x] && !visitedMatrix[pos.y][pos.x])
-            currStep.suitableNeighbors = [...neighbors]
-            for (const neighbor of neighbors) {
-                deque.pushRight({curr: neighbor, prev:curr})
+            const newNeighbors = neighbors.filter(n => !visitedMatrix[n.y][n.x])
+            currStep.suitableNeighbors = [...newNeighbors]
+            for (const n of newNeighbors) {
+                deque.pushRight({curr: n, prev:curr})
+                visitedMatrix[n.y][n.x] = true
+                visitedArray.push(n)
             }
+            currStep.deque = [...(deque.getValues()).map(posPrev => posPrev.curr)]
+            currStep.visitedIndex = visitedArray.length
         }
         searchResult.visited = visitedArray
 

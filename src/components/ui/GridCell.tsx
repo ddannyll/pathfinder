@@ -19,8 +19,6 @@ export function GridCell({children, className = '', type = 'empty', onMouseOver,
             styleClasses = 'bg-zinc-50'
         } else if (type === 'current') {
             styleClasses = 'bg-amber-300'
-        } else if (type === 'currentVisited') {
-            styleClasses = 'bg-amber-100'
         } else if (type === 'start') {
             styleClasses = 'bg-blue-500'
         } else if (type === 'wall') {

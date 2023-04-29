@@ -1,4 +1,4 @@
-import { Grid } from './Grid';
+import { Coordinate, Grid } from './Grid';
 import { Button } from './Button';
 import { FSResult, useGridBFSDFS } from '../hooks/useGridBFSDFS';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -13,7 +13,6 @@ export function GridSearcher() {
     const [currPathStep, setCurrPathStep] = useState(0)
     const [autoProgress, setAutoProgress] = useState(false)
     const [autoTimeout, setAutoTimeout] = useState<ReturnType<typeof setTimeout>>()
-    const [enableVisitedSteps, setEnabledVisitedSteps] = useState(false)
 
     const {
         start,
@@ -29,21 +28,18 @@ export function GridSearcher() {
         setWalls,
     } = useGridBFSDFS(searchMode, 25, 12, { x: 0, y: 0 }, { x: 9, y: 9 }, [])
 
-    const filteredSteps = useMemo(() => {
-        return searchResult?.steps.filter(step => step.currStatus !== 'visited' || enableVisitedSteps) || []
-    }, [searchResult, enableVisitedSteps])
 
     const searchState = useMemo<'idle' | 'search' | 'backtrack' | 'done'>(() => {
         if (currStep === 0 || !searchResult) {
             return 'idle'
-        } else if (currStep < filteredSteps.length - 1) {
+        } else if (currStep < searchResult.steps.length - 1) {
             return 'search'
-        } else if (currPathStep < searchResult?.path.length - 1) {
+        } else if (currPathStep < searchResult.path.length - 1) {
             return 'backtrack'
         } else {
             return 'done'
         }
-    }, [currStep, searchResult, filteredSteps.length, currPathStep])
+    }, [currStep, searchResult, currPathStep])
 
     useEffect(() => {
         if (gridSpaceRef.current === null || !lockAspect) {
@@ -53,6 +49,7 @@ export function GridSearcher() {
         const newHeight = Math.floor(1 / (requiredRatio / width))
         setHeight(newHeight)
     }, [gridSpaceRef, lockAspect, width, setHeight])
+
 
     useEffect(() => {
         if (!autoProgress || !searchResult) {
@@ -120,6 +117,15 @@ export function GridSearcher() {
                 >
                     {searchMode}
                 </Button>
+                <label htmlFor="range" className='flex flex-col justify-center items-center'>
+                    {`Delay: ${delay}`}
+                    <input
+                        disabled={autoProgress}
+                        onChange={(e) => {
+                            setDelay(parseInt(e.target.value))
+                        }}
+                        type="range" min={5} max={1000} step={1} />
+                </label>
                 <label className='flex flex-col justify-center items-center'>
                     {`Width: ${width}`}
                     <input
@@ -139,25 +145,6 @@ export function GridSearcher() {
                     Lock Aspect
                     <input type="checkbox" checked={lockAspect} onChange={(e) => setLockAspect(e.currentTarget.checked)} />
                 </label>
-                <label htmlFor="lockAspect" className='flex flex-col items-center'>
-                    Enable visited steps
-                    <input type="checkbox" checked={enableVisitedSteps}
-                        onChange={() => {
-                            clearTimeout(autoTimeout)
-                            setAutoProgress(false)
-                            setCurrStep(0)
-                            setCurrPathStep(0)
-                            setEnabledVisitedSteps(!enableVisitedSteps)
-                        }}
-                    />
-                </label>
-                <label htmlFor="range" className='flex flex-col justify-center items-center'>
-                    {`Delay: ${delay}`}
-                    <input
-                        value={delay}
-                        onChange={(e) => setDelay(parseInt(e.target.value))}
-                        type="range" min={5} max={250} step={1} />
-                </label>
             </div>
             <div ref={gridSpaceRef} className="grow max-h-full overflow-auto">
                 <Grid
@@ -167,9 +154,9 @@ export function GridSearcher() {
                     start={start}
                     end={end}
                     walls={walls}
-                    currSearching={currStep !== 0 ? filteredSteps[currStep].curr : undefined}
-                    currSearchingVisited={filteredSteps.length > 0 && filteredSteps[currStep].currStatus === 'visited'}
-                    searched={searchResult?.visited.slice(0, filteredSteps[currStep].visitedIndex)}
+                    currSearching={searchResult?.steps[currStep].curr || undefined}
+                    searched={searchResult?.steps.map(step => step.curr).slice(1, currStep) as Coordinate[]}
+                    toBeSearched={searchResult?.steps[currStep].deque}
                     path={searchResult?.path.slice(0, currPathStep)}
                     setStart={setStart}
                     setEnd={setEnd}
