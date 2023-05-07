@@ -8,6 +8,8 @@ Web application used to visualise and teach popular pathfinding algorithms
 
 ## Planned Features
 - Step by step code walkthrough
+- Maze Generation
+- Saving/Loading map
 - Special nodes (e.g. teleporters, weighted nodes)
 - More algorithms (e.g. dikjstras, A*) 
 
