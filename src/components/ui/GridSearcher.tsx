@@ -94,6 +94,14 @@ export function GridSearcher() {
         >
             <div className="flex gap-2">
                 <Button
+                    onClick={() => {
+                        setAutoProgress(false)
+                        setCurrStep(prev => Math.max(0, prev -1))
+                    }}
+                >
+                    Back
+                </Button>
+                <Button
                     onClick={
                         () => {
                             if (autoProgress) {
@@ -107,6 +115,17 @@ export function GridSearcher() {
                     }
                 >
                     {mainButtonText}
+                </Button>
+                <Button
+                    onClick={() => {
+                        if (!searchResult) {
+                            return
+                        }
+                        setAutoProgress(false)
+                        setCurrStep(prev => Math.min(searchResult.steps.length - 1, prev + 1))
+                    }}
+                >
+                    Next
                 </Button>
                 <Button
                     onClick={() => {
