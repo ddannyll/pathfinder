@@ -2,6 +2,8 @@ import { Coordinate, Grid } from './Grid';
 import { Button } from './Button';
 import { FSResult, useGridBFSDFS } from '../hooks/useGridBFSDFS';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faBackward, faForward } from '@fortawesome/free-solid-svg-icons';
 
 export function GridSearcher() {
     const [searchMode, setSearchMode] = useState<'BFS' | 'DFS'>('BFS')
@@ -94,48 +96,9 @@ export function GridSearcher() {
         >
             <div className="flex gap-2">
                 <Button
-                    onClick={() => {
-                        setAutoProgress(false)
-                        setCurrStep(prev => Math.max(0, prev -1))
-                    }}
+                    onClick={() => setWalls([])}
                 >
-                    Back
-                </Button>
-                <Button
-                    onClick={
-                        () => {
-                            if (autoProgress) {
-                                setAutoProgress(false)
-                            } else if (searchState === 'idle' || searchState === 'done') {
-                                startAutoSearch()
-                            } else {
-                                setAutoProgress(true)
-                            }
-                        }
-                    }
-                >
-                    {mainButtonText}
-                </Button>
-                <Button
-                    onClick={() => {
-                        if (!searchResult) {
-                            return
-                        }
-                        setAutoProgress(false)
-                        setCurrStep(prev => Math.min(searchResult.steps.length - 1, prev + 1))
-                    }}
-                >
-                    Next
-                </Button>
-                <Button
-                    onClick={() => {
-                        clearTimeout(autoTimeout)
-                        setAutoProgress(false)
-                        setCurrPathStep(0)
-                        setCurrStep(0)
-                    }}
-                >
-                    Clear Path
+                    Clear Walls
                 </Button>
                 <Button
                     onClick={() => setSearchMode(searchMode === 'BFS' ? 'DFS' : 'BFS')}
@@ -188,13 +151,56 @@ export function GridSearcher() {
                     setWalls={setWalls}
                 />
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col items-center gap-2 grid-cols-3 md:grid md:items-stretch">
 
                 <Button
-                    onClick={() => setWalls([])}
+                    className='md:place-self-start'
+                    onClick={() => {
+                        clearTimeout(autoTimeout)
+                        setAutoProgress(false)
+                        setCurrPathStep(0)
+                        setCurrStep(0)
+                    }}
                 >
-                    Clear Walls
+                    Clear Path
                 </Button>
+                <div className="flex gap-2 justify-center">
+                    <Button
+                        onClick={() => {
+                            setAutoProgress(false)
+                            setCurrStep(prev => Math.max(0, prev -1))
+                        }}
+                    >
+                        <FontAwesomeIcon icon={faBackward} className='h-full'/>
+                    </Button>
+                    <Button
+                        className='w-28'
+                        onClick={
+                            () => {
+                                if (autoProgress) {
+                                    setAutoProgress(false)
+                                } else if (searchState === 'idle' || searchState === 'done') {
+                                    startAutoSearch()
+                                } else {
+                                    setAutoProgress(true)
+                                }
+                            }
+                        }
+                    >
+                        {mainButtonText}
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            if (!searchResult) {
+                                return
+                            }
+                            setAutoProgress(false)
+                            setCurrStep(prev => Math.min(searchResult.steps.length - 1, prev + 1))
+                        }}
+                    >
+                        <FontAwesomeIcon icon={faForward} className='h-full'/>
+                    </Button>
+                </div>
             </div>
         </div>
     )
