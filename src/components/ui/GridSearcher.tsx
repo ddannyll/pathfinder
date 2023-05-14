@@ -44,6 +44,7 @@ export function GridSearcher() {
     }, [currStep, searchResult, currPathStep])
 
     useEffect(() => {
+        // Aspect Ratio Lock
         if (gridSpaceRef.current === null || !lockAspect) {
             return
         }
@@ -53,6 +54,7 @@ export function GridSearcher() {
     }, [gridSpaceRef, lockAspect, width, setHeight])
 
     useEffect(() => {
+        // Prevent previous timeout from executing when autoProgress is turned off
         if (!autoProgress) {
             clearTimeout(autoTimeout)
         }
@@ -60,6 +62,7 @@ export function GridSearcher() {
 
 
     useEffect(() => {
+        // Handling step increments when autoProgress is enabled
         if (!autoProgress || !searchResult) {
             return
         }
@@ -71,6 +74,13 @@ export function GridSearcher() {
             setAutoProgress(false)
         }
     }, [currStep, currPathStep, searchResult, delay, autoProgress, searchState])
+
+    useEffect(() => {
+        // Remove path if alogorithm is not in the backtrack/done search state
+        if (searchState === 'search' || searchState === 'idle') {
+            setCurrPathStep(0)
+        }
+    }, [autoProgress, searchState])
 
     const startAutoSearch = () => {
         setAutoProgress(true)
@@ -152,7 +162,6 @@ export function GridSearcher() {
                 />
             </div>
             <div className="flex flex-col items-center gap-2 grid-cols-3 md:grid md:items-stretch">
-
                 <Button
                     className='md:place-self-start'
                     onClick={() => {
@@ -202,6 +211,15 @@ export function GridSearcher() {
                     </Button>
                 </div>
             </div>
+            <input id="progressSlider" type="range" max={searchResult ? searchResult.steps.length - 1 : 0} min={0} value={currStep}
+                onChange={(e) => {
+                    setCurrStep(parseInt(e.target.value))
+                    setAutoProgress(false)
+                }}
+            />
+            <label htmlFor="progressSlider" className='text-center'>
+                {searchResult ? `Step ${currStep} / ${searchResult?.steps.length}` : 'Click the search button to start searching!'}
+            </label>
         </div>
     )
 }
