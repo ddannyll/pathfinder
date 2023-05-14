@@ -37,6 +37,7 @@ export function GridSearcher() {
         } else if (currStep < searchResult.steps.length - 1) {
             return 'search'
         } else if (currPathStep < searchResult.path.length - 1) {
+            setAutoProgress(true)
             return 'backtrack'
         } else {
             return 'done'
@@ -63,7 +64,7 @@ export function GridSearcher() {
 
     useEffect(() => {
         // Handling step increments when autoProgress is enabled
-        if (!autoProgress || !searchResult) {
+        if (!searchResult || !autoProgress) {
             return
         }
         if (searchState === 'idle' || searchState === 'search') {
@@ -171,7 +172,7 @@ export function GridSearcher() {
                         setCurrStep(0)
                     }}
                 >
-                    Clear Path
+                    Reset Timeline
                 </Button>
                 <div className="flex gap-2 justify-center">
                     <Button
@@ -218,7 +219,7 @@ export function GridSearcher() {
                 }}
             />
             <label htmlFor="progressSlider" className='text-center'>
-                {searchResult ? `Step ${currStep} / ${searchResult?.steps.length}` : 'Click the search button to start searching!'}
+                {searchResult ? `Step ${currStep} / ${searchResult.steps.length - 1}` : 'Click the search button to start searching!'}
             </label>
         </div>
     )
