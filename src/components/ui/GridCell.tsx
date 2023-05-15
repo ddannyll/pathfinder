@@ -49,7 +49,7 @@ export function GridCell({children, className = '', type = 'empty', onMouseOver,
         onMouseUp={onMouseUp}
         onMouseOver={onMouseOver}
         className={`border aspect-square relative ${styleClasses} ${className}`}>
-        <div className={`absolute w-full h-full flex justify-center items-center text-sm ${labelTextColor}`}>{label}</div>
+        <div className={`absolute w-full h-full flex justify-center items-center text-xs cursor-default ${labelTextColor}`}>{label}</div>
         {children}
     </div>
 }

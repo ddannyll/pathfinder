@@ -4,14 +4,14 @@ interface ButtonProps {
     children?: React.ReactNode
     onClick?: React.MouseEventHandler<HTMLButtonElement>
     disabled?: boolean
-    type?: 'primary' | 'secondary'
+    variant?: 'primary' | 'secondary'
     className?: string
 }
 
-export function Button ({children, onClick, disabled, type = 'primary', className=''}: ButtonProps) {
+export function Button ({children, onClick, disabled, variant = 'primary', className=''}: ButtonProps) {
     let styleClasses = 'bg-indigo-500 text-white active:bg-indigo-600 disabled:bg-indigo-300'
 
-    if (type === 'secondary') {
+    if (variant === 'secondary') {
         styleClasses = 'text-indigo-500'
     }
 
