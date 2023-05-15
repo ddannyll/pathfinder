@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { coordinateInArray, coordinatesEqual } from '../../helpers'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { coordinateInArray, coordinatesEqual, getAlphaRepresentationList } from '../../helpers'
 import { GridCell, GridCellTypes } from './GridCell'
 
 export interface Coordinate {
@@ -96,6 +96,7 @@ export function Grid ({
         }
     }, [placing, setStart, setEnd])
 
+    const alphaRepresentation = useMemo(() => getAlphaRepresentationList(width), [width])
     const cells: React.ReactNode[] = []
     for (let i = 0; i < height; i++) {
         for (let j = 0; j < width; j++) {
@@ -131,6 +132,7 @@ export function Grid ({
 
             cells.push(<GridCell
                 className={placingClasses}
+                label={alphaRepresentation[j] + i}
                 onMouseDown={() => handleMouseDownCell(currCoordiante)}
                 onMouseOver={() => handleMouseOverCell(currCoordiante)}
                 onMouseUp={() => handleMouseUpCell(currCoordiante)}

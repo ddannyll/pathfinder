@@ -28,7 +28,7 @@ export function GridSearcher() {
         setHeight,
         setWidth,
         setWalls,
-    } = useGridBFSDFS(searchMode, 25, 12, { x: 0, y: 0 }, { x: 9, y: 9 }, [])
+    } = useGridBFSDFS(searchMode, 25, 12, { x: 0, y: 0 }, { x: 100, y: 100 }, [])
 
 
     const searchState = useMemo<'idle' | 'search' | 'backtrack' | 'done'>(() => {

@@ -10,10 +10,12 @@ interface GridCellProps {
     onMouseDown?: () => void
     onMouseUp?: () => void
     onClick?: () => void
+    label?: string
 }
 
-export function GridCell({children, className = '', type = 'empty', onMouseOver, onMouseDown, onClick, onMouseUp, x, y}: GridCellProps) {
+export function GridCell({children, className = '', type = 'empty', onMouseOver, onMouseDown, onClick, onMouseUp, x, y, label=''}: GridCellProps) {
     let styleClasses = ''
+    let labelTextColor = 'text-black'
     if (!className) {
         if (type === 'empty') {
             styleClasses = 'bg-zinc-50'
@@ -23,14 +25,16 @@ export function GridCell({children, className = '', type = 'empty', onMouseOver,
             styleClasses = 'bg-blue-500'
         } else if (type === 'wall') {
             styleClasses = 'bg-zinc-700'
+            labelTextColor = 'text-white'
         } else if (type === 'searched') {
             styleClasses = 'bg-zinc-300 transition'
         } else if (type === 'end') {
-            styleClasses = 'bg-red-500'
+            styleClasses = 'bg-red-400'
         } else if (type === 'path') {
             styleClasses = 'bg-green-400 transition'
         }
     }
+
 
     return <div
         data-x={x}
@@ -44,7 +48,8 @@ export function GridCell({children, className = '', type = 'empty', onMouseOver,
         }}
         onMouseUp={onMouseUp}
         onMouseOver={onMouseOver}
-        className={`border aspect-square ${styleClasses} ${className}`}>
+        className={`border aspect-square relative ${styleClasses} ${className}`}>
+        <div className={`absolute w-full h-full flex justify-center items-center text-sm ${labelTextColor}`}>{label}</div>
         {children}
     </div>
 }
