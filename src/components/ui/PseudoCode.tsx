@@ -1,8 +1,8 @@
 import { FSResult } from '../hooks/useGridBFSDFS'
 import { Disclosure, Transition } from '@headlessui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronCircleUp, faChevronUp, faCircleChevronUp } from '@fortawesome/free-solid-svg-icons'
-import { useMemo, useState } from 'react'
+import { faChevronUp } from '@fortawesome/free-solid-svg-icons'
+import { useMemo } from 'react'
 import { getAlphaRepresentationList } from '../../helpers'
 
 const BFS = `function BFS(graph, root):
