@@ -51,10 +51,10 @@ export default function Pseudocode({algorithm, searchResult, currStep}: PseudoCo
     }, [searchResult])
 
     const visited = searchResult?.visited
-        .slice(0, currStep)
-        .concat(searchResult?.steps[currStep].deque)
+        .slice(0, searchResult?.steps[currStep].visitedIndex)
         .map(coordiante => `${alphaRepresentationList[coordiante.x]}${coordiante.y}`)
         .join(', ')
+
 
     const deque = searchResult?.steps[currStep].deque
         .map(coordiante => `${alphaRepresentationList[coordiante.x]}${coordiante.y}`)
