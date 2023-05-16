@@ -3,6 +3,7 @@ import { Button } from './Button';
 import { FSResult, useGridBFSDFS } from '../hooks/useGridBFSDFS';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Controls from './Controls';
+import Pseudocode from './PseudoCode';
 
 export type SearchStates = 'idle' | 'search' | 'backtrack' | 'done'
 
@@ -164,6 +165,11 @@ export function GridSearcher() {
                 startAutoSearch={startAutoSearch}
                 autoProgress={autoProgress}
                 autoTimeout={autoTimeout}
+            />
+            <Pseudocode
+                algorithm={searchMode}
+                currStep={currStep}
+                searchResult={searchResult}
             />
         </div>
     )

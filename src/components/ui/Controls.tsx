@@ -32,6 +32,7 @@ export default function Controls ({setAutoProgress, setCurrPathStep, setCurrStep
         <div className="flex flex-col items-center gap-2 grid-cols-3 md:grid md:items-stretch">
             <Button
                 className='md:place-self-start'
+                variant='secondary'
                 onClick={() => {
                     clearTimeout(autoTimeout)
                     setAutoProgress(false)

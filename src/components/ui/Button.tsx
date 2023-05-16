@@ -12,7 +12,7 @@ export function Button ({children, onClick, disabled, variant = 'primary', class
     let styleClasses = 'bg-indigo-500 text-white active:bg-indigo-600 disabled:bg-indigo-300'
 
     if (variant === 'secondary') {
-        styleClasses = 'text-indigo-500'
+        styleClasses = 'text-indigo-500 active:bg-indigo-50'
     }
 
     return <button
