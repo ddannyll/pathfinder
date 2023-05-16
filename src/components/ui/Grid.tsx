@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { coordinateInArray, coordinatesEqual, getAlphaRepresentationList } from '../../helpers'
+import React, { useCallback, useEffect, useState } from 'react'
+import { coordinateInArray, coordinatesEqual } from '../../helpers'
 import { GridCell, GridCellTypes } from './GridCell'
 
 export interface Coordinate {
@@ -20,6 +20,7 @@ export interface GridProps {
     path?: Coordinate[]
     className?: string
     disableInteractions?: boolean
+    alphaRepresentationList: string[]
     setStart: React.Dispatch<Coordinate>
     setEnd: React.Dispatch<Coordinate>
     setWalls: React.Dispatch<Coordinate[]>
@@ -37,6 +38,7 @@ export function Grid ({
     toBeSearched,
     path,
     disableInteractions = false,
+    alphaRepresentationList,
     className = '',
     setStart,
     setEnd,
@@ -96,7 +98,6 @@ export function Grid ({
         }
     }, [placing, setStart, setEnd])
 
-    const alphaRepresentation = useMemo(() => getAlphaRepresentationList(width), [width])
     const cells: React.ReactNode[] = []
     for (let i = 0; i < height; i++) {
         for (let j = 0; j < width; j++) {
@@ -132,7 +133,7 @@ export function Grid ({
 
             cells.push(<GridCell
                 className={placingClasses}
-                label={alphaRepresentation[j] + i}
+                label={alphaRepresentationList[j] + i}
                 onMouseDown={() => handleMouseDownCell(currCoordiante)}
                 onMouseOver={() => handleMouseOverCell(currCoordiante)}
                 onMouseUp={() => handleMouseUpCell(currCoordiante)}

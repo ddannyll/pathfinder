@@ -2,7 +2,7 @@ import { FSResult } from '../hooks/useGridBFSDFS'
 import { Disclosure, Transition } from '@headlessui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronUp } from '@fortawesome/free-solid-svg-icons'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { getAlphaRepresentationList } from '../../helpers'
 
 const BFS = `function BFS(graph, root):
@@ -36,20 +36,10 @@ interface PseudoCodeProps {
     algorithm: 'BFS' | 'DFS'
     currStep: number
     searchResult?: FSResult
+    alphaRepresentationList: string[]
 }
 
-export default function Pseudocode({algorithm, searchResult, currStep}: PseudoCodeProps) {
-    const alphaRepresentationList = useMemo(() => {
-        if (!searchResult) {
-            return []
-        }
-        const maxX = searchResult.visited.reduce(
-            (currMaxX, currCoordinate) => currCoordinate.x > currMaxX ? currCoordinate.x : currMaxX
-            , 0
-        ) + 1
-        return getAlphaRepresentationList(maxX)
-    }, [searchResult])
-
+export default function Pseudocode({algorithm, searchResult, currStep, alphaRepresentationList}: PseudoCodeProps) {
     const visited = searchResult?.visited
         .slice(0, searchResult?.steps[currStep].visitedIndex)
         .map(coordiante => `${alphaRepresentationList[coordiante.x]}${coordiante.y}`)

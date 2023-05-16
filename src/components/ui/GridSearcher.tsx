@@ -4,6 +4,7 @@ import { FSResult, useGridBFSDFS } from '../hooks/useGridBFSDFS';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Controls from './Controls';
 import Pseudocode from './PseudoCode';
+import { getAlphaRepresentationList } from '../../helpers';
 
 export type SearchStates = 'idle' | 'search' | 'backtrack' | 'done'
 
@@ -31,6 +32,10 @@ export function GridSearcher() {
         setWidth,
         setWalls,
     } = useGridBFSDFS(searchMode, 25, 12, { x: 0, y: 0 }, { x: 100, y: 100 }, [])
+
+    const alphaRepresentationList = useMemo(() => {
+        return  getAlphaRepresentationList(width)
+    }, [width])
 
 
     const searchState = useMemo<SearchStates>(() => {
@@ -150,6 +155,7 @@ export function GridSearcher() {
                     searched={searchResult?.steps.map(step => step.curr).slice(1, currStep) as Coordinate[]}
                     toBeSearched={searchResult?.steps[currStep].deque}
                     path={searchResult?.path.slice(0, currPathStep)}
+                    alphaRepresentationList={alphaRepresentationList}
                     setStart={setStart}
                     setEnd={setEnd}
                     setWalls={setWalls}
@@ -170,6 +176,7 @@ export function GridSearcher() {
                 algorithm={searchMode}
                 currStep={currStep}
                 searchResult={searchResult}
+                alphaRepresentationList={alphaRepresentationList}
             />
         </div>
     )
