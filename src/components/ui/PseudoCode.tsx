@@ -85,7 +85,7 @@ export default function Pseudocode({algorithm, searchResult, currStep}: PseudoCo
                     </pre>
                     <div className="h-[150px] grid grid-cols-2 grid-rows-[10px_1fr] gap-2 font-mono border-b pb-4 mb-4">
                         <h5 className='flex items-center gap-2'>
-                            Visitied Set:
+                            Visited Set:
                             <span className='w-[1rem] aspect-square border border-white bg-zinc-400 inline-block rounded -translate-y-[2px]' />
                             +
                             <span className='w-[1rem] aspect-square border border-white bg-green-200 inline-block rounded -translate-y-[2px]' />
