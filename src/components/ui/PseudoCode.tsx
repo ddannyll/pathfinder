@@ -2,8 +2,6 @@ import { FSResult } from '../hooks/useGridBFSDFS'
 import { Disclosure, Transition } from '@headlessui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronUp } from '@fortawesome/free-solid-svg-icons'
-import { useEffect, useMemo, useState } from 'react'
-import { getAlphaRepresentationList } from '../../helpers'
 
 const BFS = `function BFS(graph, root):
     Queue queue = new Queue()
