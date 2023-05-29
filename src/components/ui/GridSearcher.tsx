@@ -1,5 +1,4 @@
 import { Coordinate, Grid } from './Grid';
-import { Button } from './Button';
 import { FSResult, useGridBFSDFS } from '../hooks/useGridBFSDFS';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Controls from './Controls';

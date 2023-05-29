@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button } from './Button'
 import { Coordinate } from './Grid'
-import { Listbox, Transition } from '@headlessui/react'
+import { Listbox } from '@headlessui/react'
 import { SearchStates } from './GridSearcher'
 
 interface SecondaryControlsProps  {
@@ -25,7 +25,7 @@ const delayPresets = {
     normal: 50,
     slow: 350,
 }
-export default function SecondaryControls({searchMode, searchState, delay, autoProgress, setDelay, width, setWidth, height, lockAspect, setHeight, setLockAspect, setWalls, setSearchMode}: SecondaryControlsProps) {
+export default function SecondaryControls({searchMode, searchState, setDelay, width, setWidth, height, lockAspect, setHeight, setLockAspect, setWalls, setSearchMode}: SecondaryControlsProps) {
     const [selectedDelay, setSelectedDelay] = useState<'normal' | 'fast' | 'slow'>('normal')
     useEffect(() => {
         setDelay(delayPresets[selectedDelay])
