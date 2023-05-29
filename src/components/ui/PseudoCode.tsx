@@ -100,7 +100,7 @@ export default function Pseudocode({algorithm, searchResult, currStep, alphaRepr
                         <h5>
                             Suitable Neighbors:
                             <div className='overflow-auto scrollbar-thin scrollbar-thumb-zinc-50'>
-                                {suitableNeighbors}
+                                {suitableNeighbors}&nbsp;
                             </div>
                         </h5>
                     </div>
