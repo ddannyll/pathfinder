@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Controls from './Controls';
 import Pseudocode from './PseudoCode';
 import { getAlphaRepresentationList } from '../../helpers';
+import SecondaryControls from './SecondaryControls';
 
 export type SearchStates = 'idle' | 'search' | 'backtrack' | 'done'
 
@@ -103,46 +104,21 @@ export function GridSearcher() {
         <div
             className='flex flex-col gap-2 p-4 h-screen'
         >
-            <div className="flex gap-2">
-                <Button
-                    onClick={() => setWalls([])}
-                >
-                    Clear Walls
-                </Button>
-                <Button
-                    onClick={() => setSearchMode(searchMode === 'BFS' ? 'DFS' : 'BFS')}
-                >
-                    {searchMode}
-                </Button>
-                <label htmlFor="range" className='flex flex-col justify-center items-center'>
-                    {`Delay: ${delay}`}
-                    <input
-                        disabled={autoProgress}
-                        onChange={(e) => {
-                            setDelay(parseInt(e.target.value))
-                        }}
-                        type="range" min={5} max={1000} step={1} />
-                </label>
-                <label className='flex flex-col justify-center items-center'>
-                    {`Width: ${width}`}
-                    <input
-                        value={width}
-                        onChange={(e) => setWidth(parseInt(e.target.value))}
-                        type="range" min={5} max={50} step={1} />
-                </label>
-                <label className='flex flex-col justify-center items-center'>
-                    {`Height: ${height}`}
-                    <input
-                        disabled={lockAspect}
-                        value={height}
-                        onChange={(e) => setHeight(parseInt(e.target.value))}
-                        type="range" min={5} max={50} step={1} />
-                </label>
-                <label htmlFor="lockAspect" className='flex flex-col items-center'>
-                    Lock Aspect
-                    <input type="checkbox" checked={lockAspect} onChange={(e) => setLockAspect(e.currentTarget.checked)} />
-                </label>
-            </div>
+            <SecondaryControls
+                searchState={searchState}
+                searchMode={searchMode}
+                delay={delay}
+                setDelay={setDelay}
+                autoProgress={autoProgress}
+                width={width}
+                height={height}
+                setWidth={setWidth}
+                setHeight={setHeight}
+                lockAspect={lockAspect}
+                setLockAspect={setLockAspect}
+                setWalls={setWalls}
+                setSearchMode={setSearchMode}
+            />
             <div ref={gridSpaceRef} className="grow max-h-full overflow-auto">
                 <Grid
                     disableInteractions={searchState === 'search' || searchState === 'backtrack'}

@@ -25,7 +25,6 @@ export function getAlphaRepresentationList(maxN: number) {
     const res = [['A']]
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     while(res.length < maxN) {
-        console.log('test')
         const curr = [...res[res.length - 1]]
         let i = curr.length - 1
         while (i >= 0 && curr[i] == 'Z') {
@@ -36,7 +35,6 @@ export function getAlphaRepresentationList(maxN: number) {
             curr[i] = alphabet[alphabet.indexOf(curr[i]) + 1]
         } else {
             curr.unshift('A')
-
         }
         res.push(curr)
     }

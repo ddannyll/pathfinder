@@ -1,4 +1,4 @@
-import { faBackward, faForward } from '@fortawesome/free-solid-svg-icons'
+import { faStepForward, faStepBackward } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Button } from './Button'
 import { SearchStates } from './GridSearcher'
@@ -31,7 +31,7 @@ export default function Controls ({setAutoProgress, setCurrPathStep, setCurrStep
     return <>
         <div className="flex flex-col items-center gap-2 grid-cols-3 md:grid md:items-stretch">
             <Button
-                className='md:place-self-start'
+                className='md:place-self-start text-red-500 border-red-500 active:bg-red-50'
                 variant='secondary'
                 onClick={() => {
                     clearTimeout(autoTimeout)
@@ -49,7 +49,7 @@ export default function Controls ({setAutoProgress, setCurrPathStep, setCurrStep
                         setCurrStep(prev => Math.max(0, prev -1))
                     }}
                 >
-                    <FontAwesomeIcon icon={faBackward} className='h-full'/>
+                    <FontAwesomeIcon icon={faStepBackward} className='h-full'/>
                 </Button>
                 <Button
                     onClick={
@@ -75,7 +75,7 @@ export default function Controls ({setAutoProgress, setCurrPathStep, setCurrStep
                         setCurrStep(prev => Math.min(searchResult.steps.length - 1, prev + 1))
                     }}
                 >
-                    <FontAwesomeIcon icon={faForward} className='h-full'/>
+                    <FontAwesomeIcon icon={faStepForward} className='h-full'/>
                 </Button>
             </div>
         </div>
